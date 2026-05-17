@@ -771,100 +771,50 @@ def download():
 
     # TITLE
 
-    c.setFont(
-        "Helvetica-Bold",
-        22
-    )
+    c.setFont("Helvetica-Bold", 22)
 
-    c.drawString(
-        150,
-        800,
-        "AI Placement Report"
-    )
+    c.drawString(140, 800, "AI Placement Report")
 
     # STUDENT DETAILS
 
-    c.setFont(
-        "Helvetica",
-        14
-    )
+    c.setFont("Helvetica", 14)
+    y = 750
+    c.drawString(50, y, f"Name: {latest_report.get('name')}")
+    y -= 25
 
-    c.drawString(
-        50,
-        760,
-        f"Student Name: {latest_report.get('name')}"
-    )
+    c.drawString(50, y, f"CGPA: {latest_report.get('cgpa')}")
+    y -= 25
 
-    c.drawString(
-        50,
-        735,
-        f"CGPA: {latest_report.get('cgpa')}"
-    )
+    c.drawString(50, y, f"Projects: {latest_report.get('projects')}")
+    y -= 25
 
-    c.drawString(
-        50,
-        710,
-        f"Projects: {latest_report.get('projects')}"
-    )
+    c.drawString(50, y, f"Communication: {latest_report.get('communication')}")
+    y -= 25
 
-    c.drawString(
-        50,
-        685,
-        f"Communication: {latest_report.get('communication')}"
-    )
+    c.drawString(50, y, f"Internships: {latest_report.get('internships')}")
+    y -= 25
 
-    c.drawString(
-        50,
-        660,
-        f"Internships: {latest_report.get('internships')}"
-    )
+    c.drawString(50, y, f"Backlogs: {latest_report.get('backlogs')}")
+    y -= 25
 
-    c.drawString(
-        50,
-        635,
-        f"Backlogs: {latest_report.get('backlogs')}"
-    )
+    c.drawString(50, y, f"Skills: {latest_report.get('skills')}")
+    y -= 25
 
-    c.drawString(
-        50,
-        610,
-        f"Skills: {latest_report.get('skills')}"
-    )
-
-    c.drawString(
-        50,
-        575,
-        f"Prediction: {latest_report.get('prediction')}"
-    )
+    c.drawString(50, y, f"Prediction: {latest_report.get('prediction')}")
+    y -= 40
 
     # SUGGESTIONS
 
-    c.setFont(
-        "Helvetica-Bold",
-        16
-    )
+    c.setFont("Helvetica-Bold", 16)
 
-    c.drawString(
-        50,
-        530,
-        "Suggestions To Improve"
-    )
+    c.drawString(50, y, "Suggestions")
+    y -= 30
 
-    c.setFont(
-        "Helvetica",
-        13
-    )
-
-    y = 500
+    c.setFont("Helvetica", 13)
 
     for suggestion in latest_report.get("suggestions", []):
 
-        c.drawString(
-            60,
-            y,
-            f"- {suggestion}"
-        )
-
+        c.drawString(60, y, f"- {suggestion}")
         y -= 25
 
     c.save()
