@@ -1,3 +1,5 @@
+from turtle import lt
+
 from flask import (
     Flask,
     render_template,
@@ -488,13 +490,11 @@ def analyze():
             colors=colors
         )
 
-        plt.title(
-            "Skill Analysis"
-        )
+        plt.title("Skill Analysis")
 
-        plt.savefig(
-            "static/chart.png"
-        )
+        os.makedirs("static", exist_ok=True)
+
+        plt.savefig("static/chart.png")
 
         plt.close()
 
