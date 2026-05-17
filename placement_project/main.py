@@ -342,17 +342,19 @@ def analyze():
 
         backlogs = int(request.form.get("backlogs", 0))
 
-        skills = request.form.get("skills")
+        skills = request.form.get("skills", "")
 
-        # =========================
+        # =====================================
         # ML PREDICTION
-        # =========================
+        # =====================================
 
         prediction = model.predict([[
+
             cgpa,
             projects,
             communication,
             internships
+
         ]])[0]
 
         if prediction == 1:
@@ -363,276 +365,293 @@ def analyze():
 
             ai_message = "Need Improvement ⚠"
 
+        # =====================================
+        # COMPANY COUNT ANALYSIS
+        # =====================================
+
+        total_companies = len(companies)
+
+        eligible_companies = 0
+
+        for company, data in companies.items():
+
+            req = data["requirements"]
+
+            eligible = True
+
+            if cgpa < req[0]:
+                eligible = False
+
+            if projects < req[1]:
+                eligible = False
+
+            if communication < req[2]:
+                eligible = False
+
+            if backlogs > req[3]:
+                eligible = False
+
+            if eligible:
+                eligible_companies += 1
+
+        non_eligible_companies = (
+            total_companies - eligible_companies
+        )
+
+        # =====================================
+        # IMPROVEMENT SUGGESTIONS
+        # =====================================
+
+        suggestions = []
+
+        if cgpa < 7:
+
+            suggestions.append(
+                "Improve academic performance and maintain CGPA above 7.5"
+            )
+
+        if projects < 2:
+
+            suggestions.append(
+                "Build real-time projects using Python, Java or Web Development"
+            )
+
+        if communication < 7:
+
+            suggestions.append(
+                "Practice communication and aptitude regularly"
+            )
+
+        if internships < 1:
+
+            suggestions.append(
+                "Apply for internships to gain industry experience"
+            )
+
+        if backlogs > 0:
+
+            suggestions.append(
+                "Clear all active backlogs immediately"
+            )
+
+        if "python" not in skills.lower():
+
+            suggestions.append(
+                "Learn Python programming for better placement opportunities"
+            )
+
+        if len(suggestions) == 0:
+
+            suggestions.append(
+                "Excellent profile. Keep improving advanced technical skills"
+            )
+
+        # =====================================
+        # PIE CHART
+        # =====================================
+
+        labels = [
+
+            "CGPA",
+            "Projects",
+            "Communication",
+            "Internships"
+
+        ]
+
+        sizes = [
+
+            cgpa,
+            projects,
+            communication,
+            internships
+        ]
+
+        colors = [
+
+            '#00c6ff',
+            '#2563eb',
+            '#7c3aed',
+            '#06b6d4'
+        ]
+
+        plt.figure(figsize=(6, 6))
+
+        plt.pie(
+
+            sizes,
+
+            labels=labels,
+
+            autopct='%1.1f%%',
+
+            colors=colors
+        )
+
+        plt.title(
+            "Skill Analysis"
+        )
+
+        plt.savefig(
+            "static/chart.png"
+        )
+
+        plt.close()
+
+        # =====================================
+        # COMPANY ANALYSIS
+        # =====================================
+
+        results = []
+
+        for company, data in companies.items():
+
+            req = data["requirements"]
+
+            reasons = []
+
+            recommendations = []
+
+            eligible = True
+
+            if cgpa < req[0]:
+
+                eligible = False
+
+                reasons.append(
+                    f"Required CGPA is {req[0]}"
+                )
+
+                recommendations.append(
+                    "Improve CGPA"
+                )
+
+            if projects < req[1]:
+
+                eligible = False
+
+                reasons.append(
+                    f"Minimum {req[1]} projects required"
+                )
+
+                recommendations.append(
+                    "Build More Projects"
+                )
+
+            if communication < req[2]:
+
+                eligible = False
+
+                reasons.append(
+                    "Communication skills are low"
+                )
+
+                recommendations.append(
+                    "Improve Communication"
+                )
+
+            if backlogs > req[3]:
+
+                eligible = False
+
+                reasons.append(
+                    "Active backlogs not allowed"
+                )
+
+                recommendations.append(
+                    "Clear Backlogs"
+                )
+
+            if internships < 1:
+
+                recommendations.append(
+                    "Try Internships"
+                )
+
+            status = (
+
+                "Eligible ✅"
+
+                if eligible
+
+                else
+
+                "Not Eligible ❌"
+            )
+
+            results.append({
+
+                "company": company,
+
+                "logo": data["logo"],
+
+                "status": status,
+
+                "reasons": reasons,
+
+                "recommendations": recommendations
+            })
+
+        # =====================================
+        # SAVE HISTORY
+        # =====================================
+
+        history = History(
+
+            student_name=name,
+
+            prediction=ai_message
+        )
+
+        db.session.add(history)
+
+        db.session.commit()
+
+        # =====================================
+        # SAVE REPORT DATA
+        # =====================================
+
+        latest_report = {
+
+            "name": name,
+            "cgpa": cgpa,
+            "projects": projects,
+            "communication": communication,
+            "internships": internships,
+            "backlogs": backlogs,
+            "skills": skills,
+            "prediction": ai_message,
+            "suggestions": suggestions
+        }
+
+        # =====================================
+        # RETURN RESULT PAGE
+        # =====================================
+
         return render_template(
+
             "result.html",
+
+            results=results,
+
             name=name,
-            prediction=ai_message,
-            cgpa=cgpa,
-            projects=projects,
-            communication=communication,
-            internships=internships,
-            backlogs=backlogs,
-            skills=skills
+
+            ai_message=ai_message,
+
+            chart_path="chart.png",
+
+            suggestions=suggestions,
+
+            eligible_companies=eligible_companies,
+
+            non_eligible_companies=non_eligible_companies,
+
+            total_companies=total_companies
         )
 
     except Exception as e:
 
-        return f"Error occurred: {str(e)}"
-
-    # =====================================
-    # IMPROVEMENT SUGGESTIONS
-    # =====================================
-
-    suggestions = []
-
-    if cgpa < 7:
-
-        suggestions.append(
-            "Improve academic performance and maintain CGPA above 7.5"
-        )
-
-    if projects < 2:
-
-        suggestions.append(
-            "Build real-time projects using Python, Java or Web Development"
-        )
-
-    if communication < 7:
-
-        suggestions.append(
-            "Practice communication and aptitude regularly"
-        )
-
-    if internships < 1:
-
-        suggestions.append(
-            "Apply for internships to gain industry experience"
-        )
-
-    if backlogs > 0:
-
-        suggestions.append(
-            "Clear all active backlogs immediately"
-        )
-
-    if "python" not in skills.lower():
-
-        suggestions.append(
-            "Learn Python programming for better placement opportunities"
-        )
-
-    if len(suggestions) == 0:
-
-        suggestions.append(
-            "Excellent profile. Keep improving advanced technical skills"
-        )
-
-    # =====================================
-    # PIE CHART
-    # =====================================
-
-    labels = [
-
-        "CGPA",
-        "Projects",
-        "Communication",
-        "Internships"
-    ]
-
-    sizes = [
-
-        cgpa,
-        projects,
-        communication,
-        internships
-    ]
-
-    colors = [
-
-        '#00c6ff',
-        '#2563eb',
-        '#7c3aed',
-        '#06b6d4'
-    ]
-
-    plt.figure(figsize=(6, 6))
-
-    plt.pie(
-
-        sizes,
-
-        labels=labels,
-
-        autopct='%1.1f%%',
-
-        colors=colors
-    )
-
-    plt.title(
-        "Skill Analysis"
-    )
-
-    plt.savefig(
-        "static/chart.png"
-    )
-
-    plt.close()
-
-    # =====================================
-    # COMPANY ANALYSIS
-    # =====================================
-
-    results = []
-
-    for company, data in companies.items():
-
-        req = data["requirements"]
-
-        reasons = []
-
-        recommendations = []
-
-        eligible = True
-
-        # CGPA CHECK
-
-        if cgpa < req[0]:
-
-            eligible = False
-
-            reasons.append(
-                f"Required CGPA is {req[0]}"
-            )
-
-            recommendations.append(
-                "Improve CGPA"
-            )
-
-        # PROJECT CHECK
-
-        if projects < req[1]:
-
-            eligible = False
-
-            reasons.append(
-                f"Minimum {req[1]} projects required"
-            )
-
-            recommendations.append(
-                "Build More Projects"
-            )
-
-        # COMMUNICATION CHECK
-
-        if communication < req[2]:
-
-            eligible = False
-
-            reasons.append(
-                "Communication skills are low"
-            )
-
-            recommendations.append(
-                "Improve Communication"
-            )
-
-        # BACKLOG CHECK
-
-        if backlogs > req[3]:
-
-            eligible = False
-
-            reasons.append(
-                "Active backlogs not allowed"
-            )
-
-            recommendations.append(
-                "Clear Backlogs"
-            )
-
-        # INTERNSHIP CHECK
-
-        if internships < 1:
-
-            recommendations.append(
-                "Try Internships"
-            )
-
-        status = (
-
-            "Eligible ✅"
-
-            if eligible
-
-            else
-
-            "Not Eligible ❌"
-        )
-
-        results.append({
-
-            "company": company,
-
-            "logo": data["logo"],
-
-            "status": status,
-
-            "reasons": reasons,
-
-            "recommendations": recommendations
-        })
-
-    # =====================================
-    # SAVE HISTORY
-    # =====================================
-
-    history = History(
-
-        student_name=name,
-
-        prediction=ai_message
-    )
-
-    db.session.add(history)
-
-    db.session.commit()
-
-    # =====================================
-    # SAVE REPORT DATA
-    # =====================================
-
-    latest_report = {
-
-        "name": name,
-        "cgpa": cgpa,
-        "projects": projects,
-        "communication": communication,
-        "internships": internships,
-        "backlogs": backlogs,
-        "skills": skills,
-        "prediction": ai_message,
-        "suggestions": suggestions
-    }
-
-    # =====================================
-    # RETURN RESULT PAGE
-    # =====================================
-
-    return render_template(
-
-        "result.html",
-
-        results=results,
-
-        name=name,
-
-        ai_message=ai_message,
-
-        chart_path="chart.png",
-
-        suggestions=suggestions
-    )
-
+        return f"Error: {str(e)}"
 # =========================================
 # RESUME ANALYZER
 # =========================================
