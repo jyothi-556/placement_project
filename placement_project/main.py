@@ -609,8 +609,7 @@ def analyze():
         # SAVE REPORT DATA
         # =====================================
 
-        latest_report = {
-
+        latest_report[name] = {
             "name": name,
             "cgpa": cgpa,
             "projects": projects,
@@ -760,12 +759,16 @@ def admin():
 # PDF DOWNLOAD
 # =========================================
 
-@app.route("/download")
-def download():
+@app.route("/download/<student_name>")
+def download(student_name):
 
-    global latest_report
+    report = latest_report.get(student_name)
+ 
+    if not report:
 
-    pdf_path = "placement_report.pdf"
+        return "No report found"
+
+    pdf_path = f"{student_name}_placement_report.pdf"
 
     c = canvas.Canvas(pdf_path)
 
