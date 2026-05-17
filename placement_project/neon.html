@@ -615,3 +615,31 @@ function renderLoop(timestamp) {
 
                 // Normal flowing gradient line
                 ctx.beginPath();
+                                ctx.moveTo(pt1.x, pt1.y);
+                ctx.lineTo(pt2.x, pt2.y);
+
+                const gradient = ctx.createLinearGradient(
+                    pt1.x, pt1.y,
+                    pt2.x, pt2.y
+                );
+
+                gradient.addColorStop(0, col);
+                gradient.addColorStop(1, "#ffffff");
+
+                ctx.strokeStyle = gradient;
+                ctx.lineWidth = 2;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = col;
+                ctx.stroke();
+            });
+        }
+    }
+
+    ctx.globalCompositeOperation = 'source-over';
+    detectGestures();
+    updateHum(currentHands);
+}
+</script>
+
+</body>
+</html>

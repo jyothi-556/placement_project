@@ -9,6 +9,9 @@ from flask import (
 
 from flask_sqlalchemy import SQLAlchemy
 
+import matplotlib
+matplotlib.use('Agg')
+
 import matplotlib.pyplot as plt
 from reportlab.pdfgen import canvas
 from PyPDF2 import PdfReader

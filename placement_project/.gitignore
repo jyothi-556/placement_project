@@ -1,0 +1,20 @@
+# Virtual environments
+venv/
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Flask instance
+instance/
+
+# Uploaded files
+uploads/
+
+# Charts and generated files
+*.png
+*.pdf
+
+# VS Code
+.vscode/
