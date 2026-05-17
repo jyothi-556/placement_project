@@ -1,5 +1,3 @@
-from turtle import lt
-
 from flask import (
     Flask,
     render_template,
