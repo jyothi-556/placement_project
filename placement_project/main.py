@@ -320,59 +320,64 @@ Try Again
 # ANALYZE PAGE
 # =========================================
 
-@app.route("/analyze", methods=["POST"])
+@app.route("/analyze", methods=["GET", "POST"])
 def analyze():
 
     global latest_report
 
-    name = request.form["name"]
+    try:
 
-    cgpa = float(
-        request.form["cgpa"]
-    )
+        if request.method == "GET":
+            return render_template("index.html")
 
-    projects = int(
-        request.form["projects"]
-    )
+        name = request.form.get("name")
 
-    communication = int(
-        request.form["communication"]
-    )
+        cgpa = float(request.form.get("cgpa", 0))
 
-    internships = int(
-        request.form["internships"]
-    )
+        projects = int(request.form.get("projects", 0))
 
-    backlogs = int(
-        request.form["backlogs"]
-    )
+        communication = int(request.form.get("communication", 0))
 
-    skills = request.form["skills"]
+        internships = int(request.form.get("internships", 0))
 
-    # =====================================
-    # ML PREDICTION
-    # =====================================
+        backlogs = int(request.form.get("backlogs", 0))
 
-    prediction = model.predict([[
+        skills = request.form.get("skills")
 
-        cgpa,
-        projects,
-        communication,
-        internships
+        # =========================
+        # ML PREDICTION
+        # =========================
 
-    ]])[0]
+        prediction = model.predict([[
+            cgpa,
+            projects,
+            communication,
+            internships
+        ]])[0]
 
-    if prediction == 1:
+        if prediction == 1:
 
-        ai_message = (
-            "High Placement Probability 🚀"
+            ai_message = "High Placement Probability 🚀"
+
+        else:
+
+            ai_message = "Need Improvement ⚠"
+
+        return render_template(
+            "result.html",
+            name=name,
+            prediction=ai_message,
+            cgpa=cgpa,
+            projects=projects,
+            communication=communication,
+            internships=internships,
+            backlogs=backlogs,
+            skills=skills
         )
 
-    else:
+    except Exception as e:
 
-        ai_message = (
-            "Need Improvement ⚠"
-        )
+        return f"Error occurred: {str(e)}"
 
     # =====================================
     # IMPROVEMENT SUGGESTIONS
