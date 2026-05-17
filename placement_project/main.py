@@ -762,13 +762,15 @@ def admin():
 @app.route("/download/<student_name>")
 def download(student_name):
 
-    report = latest_report.get(student_name)
- 
-    if not report:
+    global latest_report
+
+    if student_name not in latest_report:
 
         return "No report found"
 
-    pdf_path = f"{student_name}_placement_report.pdf"
+    report = latest_report[student_name]
+
+    pdf_path = "placement_report.pdf"
 
     c = canvas.Canvas(pdf_path)
 
@@ -781,29 +783,31 @@ def download(student_name):
     # STUDENT DETAILS
 
     c.setFont("Helvetica", 14)
+
     y = 750
-    c.drawString(50, y, f"Name: {latest_report.get('name')}")
+
+    c.drawString(50, y, f"Name: {report['name']}")
     y -= 25
 
-    c.drawString(50, y, f"CGPA: {latest_report.get('cgpa')}")
+    c.drawString(50, y, f"CGPA: {report['cgpa']}")
     y -= 25
 
-    c.drawString(50, y, f"Projects: {latest_report.get('projects')}")
+    c.drawString(50, y, f"Projects: {report['projects']}")
     y -= 25
 
-    c.drawString(50, y, f"Communication: {latest_report.get('communication')}")
+    c.drawString(50, y, f"Communication: {report['communication']}")
     y -= 25
 
-    c.drawString(50, y, f"Internships: {latest_report.get('internships')}")
+    c.drawString(50, y, f"Internships: {report['internships']}")
     y -= 25
 
-    c.drawString(50, y, f"Backlogs: {latest_report.get('backlogs')}")
+    c.drawString(50, y, f"Backlogs: {report['backlogs']}")
     y -= 25
 
-    c.drawString(50, y, f"Skills: {latest_report.get('skills')}")
+    c.drawString(50, y, f"Skills: {report['skills']}")
     y -= 25
 
-    c.drawString(50, y, f"Prediction: {latest_report.get('prediction')}")
+    c.drawString(50, y, f"Prediction: {report['prediction']}")
     y -= 40
 
     # SUGGESTIONS
@@ -815,17 +819,16 @@ def download(student_name):
 
     c.setFont("Helvetica", 13)
 
-    for suggestion in latest_report.get("suggestions", []):
+    for suggestion in report["suggestions"]:
 
         c.drawString(60, y, f"- {suggestion}")
+
         y -= 25
 
     c.save()
 
     return send_file(
-
         pdf_path,
-
         as_attachment=True
     )
 
