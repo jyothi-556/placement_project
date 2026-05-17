@@ -12,9 +12,5 @@ instance/
 # Uploaded files
 uploads/
 
-# Charts and generated files
-*.png
-*.pdf
-
 # VS Code
 .vscode/
