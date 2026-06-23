@@ -227,28 +227,4 @@ Manage and monitor student data.
 
 ---
 
-# 👩‍💻 Author
 
-## Jyothi
-
-### 🔗 GitHub Profile
-:contentReference[oaicite:0]{index=0}
-
----
-
-# 📄 License
-
-This project is developed for:
-
-- Academic Learning
-- Mini Project Demonstration
-- Machine Learning Practice
-- Educational Purposes
-
----
-
-<div align="center">
-
-## ⭐ If you like this project, give it a Star on GitHub ⭐
-
-</div>
